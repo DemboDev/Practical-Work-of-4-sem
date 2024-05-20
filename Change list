@@ -4,8 +4,10 @@ Change list:
 # EN: This file will contain descriptions of the ideas and changes for this work. All information about progress, difficulties encountered, etc. will be recorded here.
 .......................................................................................................................................................................
 
-Idea 0.1. Main Idea of project
-Суть приложения будет заключаться в осуществении симуляции работы клеток.
+
+# Idea 0.1. Main Idea of project
+
+# RU: Суть приложения будет заключаться в осуществении симуляции работы клеток.
 В планах ввести следующие модификации:
 1) Карта мира состоит из множества точек (клеток).
 2) Клетки бывают разных видов, могут существовать самостоятельно, а могут образовывать колонии.
@@ -15,3 +17,15 @@ Idea 0.1. Main Idea of project
 5.1*) В зависимости от количества запасов еды внутри клетки, можно добавить 2 состояния: голод, сытость
 5.2*) Если у клетки достаточно запасов, она может просто не есть, а оставить еду другим "сородичам". 
 5.3*) Еда - клетки с особым статусом "еда" - по сути, мёртывые клетки.
+
+# EN: The essence of the application will be to carry out simulation of the work of cells.
+The following modifications are planned to be introduced:
+1) The world map consists of many points (cells).
+2) Cells are of different kinds, they can exist independently or form colonies.
+3) In each colony cells can fulfill different roles, but it is not quite clear how to distinguish them and why these roles are needed.
+4) Among the interactions between cells, we can distinguish between hostility and defense, attraction, repulsion, etc.
+5*) Extra: If all goes well, you could add the ability for cells to “share” their food with others who need it more.
+5.1*) Depending on the amount of food reserves inside the cell, you could add 2 states: hunger, satiety
+5.2*) If a cage has enough food reserves, it can simply not eat and leave the food to other “kin”. 
+5.3*) Food - cells with special status “food” are essentially dead cells.
+......................................................................................................................................................................
