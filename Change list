@@ -29,3 +29,27 @@ The following modifications are planned to be introduced:
 5.2*) If a cage has enough food reserves, it can simply not eat and leave the food to other “kin”. 
 5.3*) Food - cells with special status “food” are essentially dead cells.
 ......................................................................................................................................................................
+
+# Idea 0.8. First version
+
+# RU: Приложение собрано. Реализовал 2 типа клетк и симуляцию броуновского движения.
+Необходимо реализовать:
+1) Переделать физику движения частиц
+2) Добавить возможность частицам сталкиваться
+3) Поменять текстуру 1 из типов на другой цвет
+4) Увеличить частицы
+5*) Возможность менять размер частиц или масштаба
+6*) Добавить частицам взаимодействия
+7*) Можно сделать симуляцию деления клеток и заполнения ими рабочего поля
+
+# EN: The application is built. Realized 2 types of cells and simulation of Brownian motion.
+Need to implement:
+1) Rework the physics of particle motion
+2) Add the ability for particles to collide
+3) Change the texture of 1 of the types to a different color
+4) Make particles larger
+5*) Ability to change particle size or scale
+6*) Add particle interactions
+7*) You can make a simulation of cells dividing and filling the working field with them
+
+Translated with DeepL.com (free version)
