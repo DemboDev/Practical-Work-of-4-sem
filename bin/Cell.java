@@ -9,7 +9,7 @@ public class Cell {
     private double x, y;
     // Вектор перемещения клетки
     private double vx, vy;
-
+    private int ID = 0;
     private double startVx, startVy;
     // Тип клетки реализован через строку
     private CellType type;
@@ -20,7 +20,7 @@ public class Cell {
         this.x = x;
         this.y = y;
         this.type = type;
-        // случайная начальная скорость
+        // случайная начальная скорость и положение
         this.vx = (Math.random() - 0.5) * 2 * MAX_SPEED;
         this.vy = (Math.random() - 0.5) * 2 * MAX_SPEED;
         this.texture = new ImageIcon(getClass().getResource(type.getTexturePath())).getImage();
@@ -38,6 +38,15 @@ public class Cell {
     public void draw(Graphics g) {
         g.drawImage(texture, (int)x, (int)y, type.getSize(), type.getSize(), null);
     }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
     // Получение параметров при необходимости
     public double getX() { return x; }
     public double getY() { return y; }

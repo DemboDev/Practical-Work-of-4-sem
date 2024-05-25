@@ -11,7 +11,6 @@ public enum CellType {
 
     // Создаем константы для хранения типов с заданными параметрами
     private final Color color;
-    private int ID;
     private final String texturePath;
     private final int size;
     // Конструктор
@@ -19,14 +18,6 @@ public enum CellType {
         this.color = color;
         this.texturePath = texturePath;
         this.size = size;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
-    public int getID() {
-        return ID;
     }
 
     public String getTexturePath() {

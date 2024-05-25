@@ -9,6 +9,30 @@ public class SimulationFrame extends JFrame {
     private final int panelWidth = 1500, panelHeight = 800;
     private final double orbit = 100;
     private double G = 2;
+
+    public void sortCells(ParticlePanel particlePanel){
+        for (int numID = 0, i = 0; i < particlePanel.getParticles().size(); ++i){
+            if (particlePanel.getParticles().get(i).getID() == 0 && particlePanel.getParticles().get(i).getType().getColor() == Color.RED) {
+                particlePanel.getParticles().get(i).setID(++numID);
+            }
+            if (particlePanel.getParticles().get(i).getID() == 0 && particlePanel.getParticles().get(i).getType().getColor() == Color.BLUE) {
+                double minRadius = 10000; int minID = 0;
+                for (int j = 0; j < particlePanel.getParticles().size(); ++j) {
+                    if (particlePanel.getParticles().get(j).getID() != 0) {
+                        double cellsRadX = (particlePanel.getParticles().get(j).getX() - particlePanel.getParticles().get(i).getX());
+                        double cellsRadY = (particlePanel.getParticles().get(j).getY() - particlePanel.getParticles().get(i).getY());
+                        double radius = Math.sqrt(cellsRadX * cellsRadX + cellsRadY * cellsRadY);
+                        if (radius < minRadius) {
+                            minRadius = radius;
+                            minID = particlePanel.getParticles().get(j).getID();
+                        }
+                    }
+                }
+                particlePanel.getParticles().get(i).setID(minID);
+            }
+        }
+    }
+
     public SimulationFrame() {
         setTitle("Particle Simulation");
         setSize(panelWidth, panelHeight);
@@ -27,6 +51,9 @@ public class SimulationFrame extends JFrame {
         for (int i = 0; i < 20; i++){
             particlePanel.addParticle(new Cell(200, 150, CellType.TYPE2));
         }
+
+        // Добавим распредееление клеток
+        sortCells(particlePanel);
 
         Timer controlUpdateTimer = new Timer(100, new ActionListener() {
             @Override
