@@ -6,8 +6,8 @@ public enum CellType {
     ТИП1: Коренные клетки, вокруг них идёт образование новых клеток. Являются определяющими при формировании колонии.
     ТИП2: Простые клетки, вокруг них не собираются другие, но Они сами стремятся к соединению с клеткой типа 1. Привязаны к конкретной клетке
      */
-    TYPE1(Color.RED,"textures/seaweed[texture].png", 10),
-    TYPE2(Color.BLUE,"textures/seaweed[texture].png", 15);
+    TYPE1(Color.RED,"textures/seaweed2[texture].png", 10),
+    TYPE2(Color.BLUE,"textures/seaweed3[texture].png", 15);
 
     // Создаем константы для хранения типов с заданными параметрами
     private final Color color;

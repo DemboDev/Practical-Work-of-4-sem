@@ -2,19 +2,25 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ControlPanel extends JPanel {
-    private JSlider speedSlider;
-    private JLabel speedLabel;
+    private JSlider Slider;
+    private JLabel Label;
 
-    public ControlPanel() {
+    public ControlPanel(String name, int min, int max, int start) {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Используем BoxLayout
+
         setLayout(new GridLayout(2, 1));
-        speedLabel = new JLabel("Speed");
-        speedSlider = new JSlider(1, 500, 30);
+        Label = new JLabel(name);
+        Slider = new JSlider(min, max, start);
 
-        add(speedLabel);
-        add(speedSlider);
+        add(Label);
+        add(Slider);
     }
 
-    public int getSpeed() {
-        return speedSlider.getValue();
+    public int getValue() {
+        return Slider.getValue();
+    }
+
+    public JSlider getSlider() {
+        return Slider;
     }
 }

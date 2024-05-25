@@ -6,10 +6,12 @@ import java.util.Objects;
 
 public class SimulationFrame extends JFrame {
     private ParticlePanel particlePanel;
-    private ControlPanel controlPanel;
+    private ControlPanel panelGravity, panelFrequency;
+    private ControlField panelField;
     private final int panelWidth = 1500, panelHeight = 800;
     private final double orbit = 100;
     private double G = 2;
+    private int frequency = 100;
 
     public void moveNearID(ParticlePanel particlePanel){
         for (int i = 0; i < particlePanel.getParticles().size(); ++i){
@@ -69,10 +71,23 @@ public class SimulationFrame extends JFrame {
         setLayout(new BorderLayout());
 
         particlePanel = new ParticlePanel();
-        controlPanel = new ControlPanel();
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+
+        panelGravity = new ControlPanel("Gravity", 1, 300, 30);
+        panelFrequency = new ControlPanel("Frequency", 10, 900, 100);
+        panelField = new ControlField("Add Cells");
+
+        bottomPanel.add(panelField);
+        bottomPanel.add(panelGravity);
+        bottomPanel.add(panelFrequency);
 
         add(particlePanel, BorderLayout.CENTER);
-        add(controlPanel, BorderLayout.SOUTH);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+
+
         for (int i = 0; i < 66; i++){
             particlePanel.addParticle(new Cell(CellType.TYPE1));
         }
@@ -81,18 +96,62 @@ public class SimulationFrame extends JFrame {
             particlePanel.addParticle(new Cell(CellType.TYPE2));
         }
 
-        // Добавим распредееление клеток
-        //sortCells(particlePanel);
-        // Передвижение клеток
-        Timer controlUpdateTimer = new Timer(100, new ActionListener() {
+        // Добавление обработчика для кнопки "OK"
+        panelField.getAddButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                G = (double) controlPanel.getSpeed() / 10;
+                try {
+                    int numParticles = Integer.parseInt(panelField.getNumberInput().getText());
+                    int maxParticles = 600;
+                    if (numParticles <= 200) {
+                        if (particlePanel.getParticles().size() <= maxParticles) {
+                            if (particlePanel.getParticles().size() + numParticles < maxParticles) {
+                                for (int i = 0; i < numParticles; i++) {
+                                    double x = Math.random() * particlePanel.getWidth();
+                                    double y = Math.random() * particlePanel.getHeight();
+                                    CellType type = (Math.random() < 0.5) ? CellType.TYPE1 : CellType.TYPE2;
+                                    particlePanel.addParticle(new Cell(x, y, type));
+                                }
+                            }
+                            else {
+                                for (int i = 0; i < maxParticles - numParticles; i++) {
+                                    double x = Math.random() * particlePanel.getWidth();
+                                    double y = Math.random() * particlePanel.getHeight();
+                                    CellType type = (Math.random() < 0.5) ? CellType.TYPE1 : CellType.TYPE2;
+                                    particlePanel.addParticle(new Cell(x, y, type));
+                                }
+                            }
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(SimulationFrame.this, "Particle limit reached", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(SimulationFrame.this, "Please enter a valid number", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(SimulationFrame.this, "Please enter a valid number", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        frequency = panelFrequency.getValue();
+        // Передвижение клеток
+        Timer controlUpdateTimer = new Timer(frequency, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                G = (double) panelGravity.getValue() / 10;
                 moveNearID(particlePanel);
                 moveToBorder(particlePanel);
             }
         });
         controlUpdateTimer.start();
+
+        // Добавляем слушатель изменений для слайдера частоты обновления
+        panelFrequency.getSlider().addChangeListener(e -> {
+            int newFrequency = panelFrequency.getValue();
+            controlUpdateTimer.setDelay(newFrequency);
+        });
     }
 
     public static void main(String[] args) {
