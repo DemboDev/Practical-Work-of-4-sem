@@ -44,14 +44,6 @@ public class SimulationFrame extends JFrame {
                                     tempX = ((G / radius) * cellsRadX);
                                     tempY = ((G / radius) * cellsRadY);
                                 }
-//                                if (radius < orbit && radius > orbit / 4) {
-//                                    tempX = orbit - (particlePanel.getParticles().get(j).getX() - particlePanel.getParticles().get(i).getX()) * 4;
-//                                    tempY = orbit - (particlePanel.getParticles().get(j).getY() - particlePanel.getParticles().get(i).getY()) * 4;
-//                                }
-//                                if (radius < orbit / 4) {
-//                                    tempX -= orbit - (particlePanel.getParticles().get(j).getX() - particlePanel.getParticles().get(i).getX());
-//                                    tempY -= orbit - (particlePanel.getParticles().get(j).getY() - particlePanel.getParticles().get(i).getY());
-//                                }
                             }
                         }
                     }
