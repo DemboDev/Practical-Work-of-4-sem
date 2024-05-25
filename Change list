@@ -51,3 +51,22 @@ Need to implement:
 5*) Ability to change particle size or scale
 6*) Add particle interactions
 7*) You can make a simulation of cells dividing and filling the working field with them
+......................................................................................................................................................................
+
+# Idea 0.8.1. New Idea
+
+# RU: Приложение уже на довольно неплохом уровне. Появились дополнительная идея для реализации.
+- Добавить меню перед запуском программы для ввода начального количества типов клеток. 
+
+Уже добавлено:
+1) Возможность изменять частоту обновления движения
+2) Возможность дабавлять клетки во время работы приложения
+3) 5 новых видов клеток (пока что только текстуры)
+
+# EN: The application is already at a pretty good level. There is an additional idea for implementation.
+- Add a menu before starting the program to enter the initial number of cell types.
+
+Already added:
+1) Ability to change the frequency of motion updates
+2) Ability to add cells while the application is running
+3) 5 new cell types (only textures so far)
