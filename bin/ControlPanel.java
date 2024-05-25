@@ -8,7 +8,7 @@ public class ControlPanel extends JPanel {
     public ControlPanel() {
         setLayout(new GridLayout(2, 1));
         speedLabel = new JLabel("Speed");
-        speedSlider = new JSlider(1, 50, 1);
+        speedSlider = new JSlider(1, 500, 30);
 
         add(speedLabel);
         add(speedSlider);

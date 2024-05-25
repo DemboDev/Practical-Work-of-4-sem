@@ -20,9 +20,16 @@ public class Cell {
         this.x = x;
         this.y = y;
         this.type = type;
+        // случайная начальная скорость
+        this.texture = new ImageIcon(getClass().getResource(type.getTexturePath())).getImage();
+        startVx = this.vx = (Math.random() - 0.5) * 2 * MAX_SPEED;
+        startVy = this.vy = (Math.random() - 0.5) * 2 * MAX_SPEED;
+    }
+    public Cell(CellType type) {
+        this.x = (Math.random()) * 1500;
+        this.y = (Math.random()) * 800;
+        this.type = type;
         // случайная начальная скорость и положение
-        this.vx = (Math.random() - 0.5) * 2 * MAX_SPEED;
-        this.vy = (Math.random() - 0.5) * 2 * MAX_SPEED;
         this.texture = new ImageIcon(getClass().getResource(type.getTexturePath())).getImage();
         startVx = this.vx = (Math.random() - 0.5) * 2 * MAX_SPEED;
         startVy = this.vy = (Math.random() - 0.5) * 2 * MAX_SPEED;
