@@ -9,11 +9,10 @@ public class SimulationFrame extends JFrame {
     private ParticlePanel particlePanel;
     private ControlPanel panelGravity, panelFrequency;
     private ControlField panelField;
-    private ControlButton btnPause, btnShow;
+    private ControlButton btnPause, btnShow, btnRestart;
     private final int panelWidth = 1300, panelHeight = 600;
-    private final double orbit = 100;
     private double G = 2;
-    private int frequency = 100, lastFrequency;
+    private int frequency = 100;
     private boolean isPaused = false, isShowed = true;
 
     public void moveNearID(ParticlePanel particlePanel){
@@ -67,7 +66,7 @@ public class SimulationFrame extends JFrame {
         }
     }
 
-    public SimulationFrame() {
+    public SimulationFrame(int initialParticles, int initialTypes) {
         setTitle("Simulation of the Life");
         setSize(panelWidth, panelHeight);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -79,16 +78,19 @@ public class SimulationFrame extends JFrame {
         JPanel topPanel = new JPanel();
         JPanel bottomPanel = new JPanel();
         JPanel settingsPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
+        btnRestart = new ControlButton("RESTART");
         btnShow = new ControlButton("HIDE");
         btnPause = new ControlButton("PAUSE");
-        panelGravity = new ControlPanel("Gravity", 1, 300, 30);
+        panelGravity = new ControlPanel("Gravity", 1, 300, 180);
         panelFrequency = new ControlPanel("Frequency", 10, 900, 100);
         panelField = new ControlField("Add Cells");
 
         topPanel.add(btnPause);
+        topPanel.add(btnRestart);
 
         showPanel.add(btnShow);
 
@@ -103,8 +105,6 @@ public class SimulationFrame extends JFrame {
         add(topPanel, BorderLayout.NORTH);
         add(settingsPanel, BorderLayout.SOUTH);
 
-        int numTypes = 2;
-
         // Импорт текстур в массив textures
         java.util.List<String> textures = new ArrayList<>();
         textures.add("textures/seaweed[texture].png");
@@ -115,6 +115,7 @@ public class SimulationFrame extends JFrame {
         //.................................................................
         // Определение типов частиц
         //.................................................................
+
         int tempSize;
         Color tempColor;
         // Определение ПЕРВОГО типа
@@ -146,6 +147,15 @@ public class SimulationFrame extends JFrame {
         });
         controlUpdateTimer.start();
 
+        // Добавляем обработчик для кнопки "Restart"
+        btnRestart.getButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new StartWindow().setVisible(true);
+                SimulationFrame.this.dispose();
+            }
+        });
+
         btnPause.getButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -154,13 +164,13 @@ public class SimulationFrame extends JFrame {
                         p.cont();
                     }
                     controlUpdateTimer.start();
-                    btnPause.getButton().setText("Pause");
+                    btnPause.getButton().setText("PAUSE");
                 } else {
                     for (Cell p : particlePanel.getParticles()){
                         p.stop();
                     }
                     controlUpdateTimer.stop();
-                    btnPause.getButton().setText("Resume");
+                    btnPause.getButton().setText("RESUME");
                 }
                 isPaused = !isPaused;
             }
@@ -232,11 +242,14 @@ public class SimulationFrame extends JFrame {
             int newFrequency = panelFrequency.getValue();
             controlUpdateTimer.setDelay(newFrequency);
         });
+
+        setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new SimulationFrame().setVisible(true);
+            new StartWindow().setVisible(true);
         });
     }
 }
