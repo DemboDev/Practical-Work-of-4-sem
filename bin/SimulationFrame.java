@@ -17,12 +17,12 @@ public class SimulationFrame extends JFrame {
 
     public void moveNearID(ParticlePanel particlePanel){
         for (int i = 0; i < particlePanel.getParticles().size(); ++i){
-            String firstType = particlePanel.getParticles().get(i).getType().getColor().toString();
+            CellType fType = particlePanel.getParticles().get(i).getType();
             int minCellIterator = i;
             double minRadius = 0;
             for (int j = 0; j < particlePanel.getParticles().size(); ++j) {
-                String secondType = particlePanel.getParticles().get(j).getType().getColor().toString();
-                if (Objects.equals(firstType, secondType) && i != j) {
+                CellType sType = particlePanel.getParticles().get(j).getType();
+                if (Objects.equals(fType, sType) && i != j) {
                     double cellsRadX = (particlePanel.getParticles().get(j).getX() - particlePanel.getParticles().get(i).getX());
                     double cellsRadY = (particlePanel.getParticles().get(j).getY() - particlePanel.getParticles().get(i).getY());
                     double radius = Math.sqrt(cellsRadX * cellsRadX + cellsRadY * cellsRadY);
@@ -105,34 +105,21 @@ public class SimulationFrame extends JFrame {
         add(topPanel, BorderLayout.NORTH);
         add(settingsPanel, BorderLayout.SOUTH);
 
-        // Импорт текстур в массив textures
-        java.util.List<String> textures = new ArrayList<>();
-        textures.add("textures/seaweed[texture].png");
-        for(int i = 2; i <= 5; ++i) {
-            textures.add("textures/seaweed" + i + "[texture].png");
-        }
-
         //.................................................................
         // Определение типов частиц
         //.................................................................
+        java.util.List<CellType> type = new ArrayList<>();
+        for (int i = 1; i <= initialTypes; ++i) {
 
-        int tempSize;
-        Color tempColor;
-        // Определение ПЕРВОГО типа
-        tempSize = 100;
-        tempColor = Color.RED;
-        CellType type1 = new CellType(tempColor, textures.get(0), tempSize);
-
-        tempSize = 150;
-        tempColor = Color.BLUE;
-        CellType type2 = new CellType(tempColor, textures.get(1), tempSize);
-
-        for (int i = 0; i < 6; i++){
-            particlePanel.addParticle(new Cell(type1));
+            type.add(new CellType("textures/seaweed" + i + "[texture].png", 100));
         }
+        setTitle(Integer.toString(initialParticles));
         // Добавляем начальные частицы
-        for (int i = 0; i < 6; i++){
-            particlePanel.addParticle(new Cell(type2));
+        for (int i = 0; i < initialParticles; ++i){
+
+            for (int j = 0; j < initialTypes; ++j) {
+                particlePanel.addParticle(new Cell(type.get(j)));
+            }
         }
 
         frequency = panelFrequency.getValue();
@@ -203,8 +190,8 @@ public class SimulationFrame extends JFrame {
                                 for (int i = 0; i < numParticles; i++) {
                                     double x = Math.random() * particlePanel.getWidth();
                                     double y = Math.random() * particlePanel.getHeight();
-                                    CellType type = (Math.random() < 0.5) ? type1 : type2;
-                                    particlePanel.addParticle(new Cell(x, y, type));
+                                    CellType localType = type.get((int) (Math.random() * initialTypes));
+                                    particlePanel.addParticle(new Cell(x, y, localType));
                                     if (isPaused){
                                         particlePanel.getParticles().getLast().stop();
                                     }
@@ -214,8 +201,8 @@ public class SimulationFrame extends JFrame {
                                 for (int i = 0; i < maxParticles - numParticles; i++) {
                                     double x = Math.random() * particlePanel.getWidth();
                                     double y = Math.random() * particlePanel.getHeight();
-                                    CellType type = (Math.random() < 0.5) ? type1 : type2;
-                                    particlePanel.addParticle(new Cell(x, y, type));
+                                    CellType localType = type.get((int) (Math.random() * initialTypes));
+                                    particlePanel.addParticle(new Cell(x, y, localType));
                                     if (isPaused){
                                         particlePanel.getParticles().getLast().stop();
                                     }
