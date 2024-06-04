@@ -8,7 +8,7 @@ public class Cell {
     // Координаты клетки
     private double x, y;
     // Вектор перемещения клетки
-    private double vx, vy;
+    private double vx, vy, lastVX, lastVY;
     private int ID = 0;
     private double startVx, startVy;
     // Тип клетки реализован через строку
@@ -65,4 +65,32 @@ public class Cell {
     public void setVy(double vy) { this.vy = vy; }
     public void setX(double x) { this.x = x; }
     public void setY(double y) { this.y = y; }
+
+    public double getLastVX() {
+        return lastVX;
+    }
+
+    public void setLastVX(double lastVX) {
+        this.lastVX = lastVX;
+    }
+
+    public double getLastVY() {
+        return lastVY;
+    }
+
+    public void stop(){
+        setLastVX(getVx());
+        setLastVY(getVy());
+        setVx(0);
+        setVy(0);
+    }
+
+    public void cont(){
+        setVx(getLastVX());
+        setVy(getLastVY());
+    }
+
+    public void setLastVY(double lastVY) {
+        this.lastVY = lastVY;
+    }
 }
