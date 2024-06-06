@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.sound.sampled.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class SimulationFrame extends JFrame {
     private final ParticlePanel particlePanel;
@@ -17,6 +23,7 @@ public class SimulationFrame extends JFrame {
     private final ControlButton btnShow;
     private final ControlButton btnRestart;
     private StatisticsPanel statisticsPanel;
+    private Clip clip;
     private final int limitCells = 1000;
     private final int panelWidth = 1300, panelHeight = 600;
     private double G = 2;
@@ -124,11 +131,17 @@ public class SimulationFrame extends JFrame {
         predator.setSize(predator.getSize() / 2);
         predator.setHealth(predator.getHealth() / 2);
         toAdd.add(new Cell(predator.getX(), predator.getY(), predator.getType(), predator.getSize()));
+        playSound();
+    }
+
+    private void playSound() {
+        if (clip.isRunning())
+            clip.stop();
+        clip.setFramePosition(0);
+        clip.start();
     }
 
     private void updateParticles() {
-        // Ваша логика обновления частиц...
-
         // Обновление статистики
         Map<Integer, Integer> typeCounts = new HashMap<>();
         for (Cell cell : particlePanel.getParticles()) {
@@ -145,6 +158,14 @@ public class SimulationFrame extends JFrame {
         setSize(panelWidth, panelHeight);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        try {
+            clip = AudioSystem.getClip();
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream("Sounds/division.wav")));
+            clip.open(inputStream);
+        } catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
+            e.printStackTrace();
+        }
 
         Color darkGray = new Color(30,50,60);
         Color gray = new Color(40,60,70);
