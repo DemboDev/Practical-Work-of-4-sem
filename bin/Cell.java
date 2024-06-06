@@ -60,7 +60,13 @@ public class Cell {
     }
     // отрисовка клетки
     public void draw(Graphics g) {
-        g.drawImage(this.texture, (int)x, (int)y, this.size, this.size, null);
+        if (texture != null) {
+            g.drawImage(this.texture, (int)x, (int)y, this.size, this.size, null);
+        }
+        else {
+            g.setColor(Color.GREEN);
+            g.fillOval((int) x, (int) y, size, size);
+        }
     }
 
     // Функции для управления клетками

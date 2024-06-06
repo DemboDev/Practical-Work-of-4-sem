@@ -14,6 +14,9 @@ public class SimulationFrame extends JFrame {
     private double G = 2;
     private final int limitDiv = 200;
     private boolean isPaused = false, isShowed = true;
+    int countOfTick;
+    int initTypes;
+    private CellType plant;
 
     //...........................................................................
     // Логика движения частиц
@@ -21,25 +24,27 @@ public class SimulationFrame extends JFrame {
     public void moveNearID(ParticlePanel particlePanel){
         for (int i = 0; i < particlePanel.getParticles().size(); ++i){
             CellType fType = particlePanel.getParticles().get(i).getType();
-            int minCellIterator = i;
-            double minRadius = 0;
-            for (int j = 0; j < particlePanel.getParticles().size(); ++j) {
-                CellType sType = particlePanel.getParticles().get(j).getType();
-                if (Objects.equals(fType, sType) && i != j) {
-                    double cellsRadX = (particlePanel.getParticles().get(j).getX() - particlePanel.getParticles().get(i).getX());
-                    double cellsRadY = (particlePanel.getParticles().get(j).getY() - particlePanel.getParticles().get(i).getY());
-                    double radius = Math.sqrt(cellsRadX * cellsRadX + cellsRadY * cellsRadY);
-                    if (minRadius > radius || minRadius == 0)  {
-                        minRadius = radius;
-                        minCellIterator = j;
+            if (fType != plant){
+                int minCellIterator = i;
+                double minRadius = 0;
+                for (int j = 0; j < particlePanel.getParticles().size(); ++j) {
+                    CellType sType = particlePanel.getParticles().get(j).getType();
+                    if (Objects.equals(fType, sType) && i != j) {
+                        double cellsRadX = (particlePanel.getParticles().get(j).getX() - particlePanel.getParticles().get(i).getX());
+                        double cellsRadY = (particlePanel.getParticles().get(j).getY() - particlePanel.getParticles().get(i).getY());
+                        double radius = Math.sqrt(cellsRadX * cellsRadX + cellsRadY * cellsRadY);
+                        if (minRadius > radius || minRadius == 0) {
+                            minRadius = radius;
+                            minCellIterator = j;
+                        }
                     }
                 }
-            }
-            if (minRadius != 0) {
-                double cellsRadX = (particlePanel.getParticles().get(minCellIterator).getX() - particlePanel.getParticles().get(i).getX());
-                double cellsRadY = (particlePanel.getParticles().get(minCellIterator).getY() - particlePanel.getParticles().get(i).getY());
-                particlePanel.getParticles().get(i).setVx((particlePanel.getParticles().get(i).getVx() + ((G / minRadius) * cellsRadX)) / 2);
-                particlePanel.getParticles().get(i).setVy((particlePanel.getParticles().get(i).getVy() + ((G / minRadius) * cellsRadY)) / 2);
+                if (minRadius != 0) {
+                    double cellsRadX = (particlePanel.getParticles().get(minCellIterator).getX() - particlePanel.getParticles().get(i).getX());
+                    double cellsRadY = (particlePanel.getParticles().get(minCellIterator).getY() - particlePanel.getParticles().get(i).getY());
+                    particlePanel.getParticles().get(i).setVx((particlePanel.getParticles().get(i).getVx() + ((G / minRadius) * cellsRadX)) / 2);
+                    particlePanel.getParticles().get(i).setVy((particlePanel.getParticles().get(i).getVy() + ((G / minRadius) * cellsRadY)) / 2);
+                }
             }
         }
     }
@@ -69,18 +74,21 @@ public class SimulationFrame extends JFrame {
     // Логика взаимодействия частиц
     //...........................................................................
     private boolean isNear(Cell f, Cell s) {
-        double whenNear = f.getSize() / 3 + s.getSize() / 3;
+        double whenNear;
+        whenNear = (double) f.getSize() / 3 + (double) s.getSize() / 3;
+        if (s.getType() == plant) {
+            if (f.getY() < s.getY() && f.getX() < s.getX()){
+                whenNear += (double) f.getSize() / 2;
+            }
+        }
         double cellsRadX = (f.getX() - s.getX());
         double cellsRadY = (f.getY() - s.getY());
         double radius = Math.sqrt(cellsRadX * cellsRadX + cellsRadY * cellsRadY);
-        if (radius >= whenNear)
-            return false;
-        else
-            return true;
+        return (radius <= whenNear);
     }
 
     private boolean canEat(Cell predator, Cell prey) {
-        return (predator.getSize() > prey.getSize() && predator.getType() != prey.getType());
+        return (predator.getSize() > prey.getSize() && predator.getType() != prey.getType() && predator.getType() != plant);
     }
 
     private void eating(Cell predator, Cell prey, java.util.List<Cell> toRemove, java.util.List<Cell> toAdd) {
@@ -108,6 +116,7 @@ public class SimulationFrame extends JFrame {
         predator.setHealth((int) (predator.getHealth() / 2));
         toAdd.add(new Cell(predator.getX(), predator.getY(), predator.getType()));
     }
+
     //...........................................................................
     // Основная функция
     //...........................................................................
@@ -153,18 +162,25 @@ public class SimulationFrame extends JFrame {
         //.................................................................
         // Создание частиц
         //.................................................................
+        initTypes = initialTypes;
         java.util.List<CellType> type = new ArrayList<>();
         for (int i = 1; i <= initialTypes; ++i) {
             type.add(new CellType("textures/seaweed" + i + "[texture].png", 100));
         }
-        setTitle(Integer.toString(initialParticles));
+        plant = new CellType("notexture", 5);
+        type.add(plant);
         // Добавляем начальные частицы
         for (int i = 0; i < initialParticles; ++i){
             for (int j = 0; j < initialTypes; ++j) {
                 particlePanel.addParticle(new Cell(type.get(j)));
             }
         }
-
+        for (int i = 0; i < 25; ++i) {
+            particlePanel.getParticles().add(new Cell(plant));
+            particlePanel.getParticles().getLast().setVx(0);
+            particlePanel.getParticles().getLast().setVy(0);
+            particlePanel.getParticles().getLast().setSize(15);
+        }
         //...........................................................................
         // Слушатели обновлений
         //...........................................................................
@@ -173,6 +189,16 @@ public class SimulationFrame extends JFrame {
         Timer controlUpdateTimer = new Timer(frequency, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                countOfTick += 1;
+                if (countOfTick % 100 == 0) {
+                    countOfTick -= 100;
+                    for (int i = 0; i < 25; ++i) {
+                        particlePanel.getParticles().add(new Cell(plant));
+                        particlePanel.getParticles().getLast().setVx(0);
+                        particlePanel.getParticles().getLast().setVy(0);
+                        particlePanel.getParticles().getLast().setSize(10);
+                    }
+                }
                 java.util.List<Cell> toAdd = new ArrayList<>();
                 java.util.List<Cell> toRemove = new ArrayList<>();
                 G = (double) panelGravity.getValue() / 10;
