@@ -15,6 +15,9 @@ public class SimulationFrame extends JFrame {
     private int frequency = 100;
     private boolean isPaused = false, isShowed = true;
 
+    //...........................................................................
+    // Логика движения частиц
+    //...........................................................................
     public void moveNearID(ParticlePanel particlePanel){
         for (int i = 0; i < particlePanel.getParticles().size(); ++i){
             CellType fType = particlePanel.getParticles().get(i).getType();
@@ -45,27 +48,26 @@ public class SimulationFrame extends JFrame {
         for (int i = 0; i < particlePanel.getParticles().size(); ++i){
             if (particlePanel.getParticles().get(i).getX() < 1) {
                 particlePanel.getParticles().get(i).setX(1);
-                particlePanel.getParticles().get(i).changeDirectionX();
             }
             if (particlePanel.getParticles().get(i).getY() < 1) {
                 particlePanel.getParticles().get(i).setY(1);
-                particlePanel.getParticles().get(i).changeDirectionY();
             }
             if (particlePanel.getParticles().get(i).getX() >= panelWidth) {
                 if (particlePanel.getParticles().get(i).getX() > panelWidth) {
                     particlePanel.getParticles().get(i).setX(panelWidth - 1);
                 }
-                particlePanel.getParticles().get(i).changeDirectionX();
             }
             if (particlePanel.getParticles().get(i).getY() >= panelHeight) {
                 if (particlePanel.getParticles().get(i).getY() > panelHeight) {
                     particlePanel.getParticles().get(i).setY(panelHeight - 1);
                 }
-                particlePanel.getParticles().get(i).changeDirectionY();
             }
         }
     }
 
+    //...........................................................................
+    // Основная функция
+    //...........................................................................
     public SimulationFrame(int initialParticles, int initialTypes) {
         setTitle("Simulation of the Life");
         setSize(panelWidth, panelHeight);
@@ -85,7 +87,7 @@ public class SimulationFrame extends JFrame {
         btnRestart = new ControlButton("RESTART");
         btnShow = new ControlButton("HIDE");
         btnPause = new ControlButton("PAUSE");
-        panelGravity = new ControlPanel("Gravity", 1, 300, 180);
+        panelGravity = new ControlPanel("Gravity", 1, 300, 90);
         panelFrequency = new ControlPanel("Frequency", 10, 900, 100);
         panelField = new ControlField("Add Cells");
 
@@ -106,22 +108,23 @@ public class SimulationFrame extends JFrame {
         add(settingsPanel, BorderLayout.SOUTH);
 
         //.................................................................
-        // Определение типов частиц
+        // Создание частиц
         //.................................................................
         java.util.List<CellType> type = new ArrayList<>();
         for (int i = 1; i <= initialTypes; ++i) {
-
             type.add(new CellType("textures/seaweed" + i + "[texture].png", 100));
         }
         setTitle(Integer.toString(initialParticles));
         // Добавляем начальные частицы
         for (int i = 0; i < initialParticles; ++i){
-
             for (int j = 0; j < initialTypes; ++j) {
                 particlePanel.addParticle(new Cell(type.get(j)));
             }
         }
 
+        //...........................................................................
+        // Слушатели обновлений
+        //...........................................................................
         frequency = panelFrequency.getValue();
         // Передвижение клеток
         Timer controlUpdateTimer = new Timer(frequency, new ActionListener() {

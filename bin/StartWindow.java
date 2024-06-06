@@ -31,10 +31,10 @@ public class StartWindow extends JFrame {
                 try {
                     int numParticles = Integer.parseInt(numParticlesField.getText());
                     int numTypes = Integer.parseInt(numTypesField.getText());
-                    if (numParticles <= 100 && numTypes <= 5 && numParticles > 0 && numTypes > 2) {
+                    if (numParticles <= 100 && numTypes <= 5 && numParticles >= 2 && numTypes >= 2) {
                         new SimulationFrame(numParticles, numTypes).setVisible(true);
                         StartWindow.this.dispose();
-                    } else if (numParticles > 100 || numParticles < 0)
+                    } else if (numParticles > 100 || numParticles < 2)
                         JOptionPane.showMessageDialog(StartWindow.this, "Please enter a valid number of Particles", "Error", JOptionPane.ERROR_MESSAGE);
                     else
                         JOptionPane.showMessageDialog(StartWindow.this, "Please enter a valid number of Types", "Error", JOptionPane.ERROR_MESSAGE);
