@@ -35,6 +35,23 @@ public class Cell {
         this.vx = (Math.random() - 0.5) * 2 * 10;
         this.vy = (Math.random() - 0.5) * 2 * 10;
     }
+    public Cell(double x, double y, CellType type, int size) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.size = size;
+        if (this.size < 50) {
+            this.size = 50;
+        }
+        this.health = size;
+        // случайная начальная скорость
+        URL imageUrl = getClass().getResource(type.getTexturePath());
+        if (imageUrl != null) {
+            this.texture = new ImageIcon(imageUrl).getImage();
+        }
+        this.vx = (Math.random() - 0.5) * 2 * 10;
+        this.vy = (Math.random() - 0.5) * 2 * 10;
+    }
     public Cell(CellType type) {
         this.x = (Math.random()) * 1500;
         this.y = (Math.random()) * 800;
@@ -52,7 +69,19 @@ public class Cell {
         this.vx = (Math.random() - 0.5) * 2 * 10;
         this.vy = (Math.random() - 0.5) * 2 * 10;
     }
-
+    public Cell(CellType type, int size) {
+        this.x = (Math.random()) * 1500;
+        this.y = (Math.random()) * 800;
+        this.type = type;
+        this.size = size;
+        this.health = size;
+        URL imageUrl = getClass().getResource(type.getTexturePath());
+        if (imageUrl != null) {
+            this.texture = new ImageIcon(imageUrl).getImage();
+        }
+        this.vx = 0;
+        this.vy = 0;
+    }
     // обновление положения
     public void update() {
         x += vx;
@@ -64,8 +93,11 @@ public class Cell {
             g.drawImage(this.texture, (int)x, (int)y, this.size, this.size, null);
         }
         else {
-            g.setColor(Color.GREEN);
-            g.fillOval((int) x, (int) y, size, size);
+            URL imageUrl = getClass().getResource("textures/plant.png");
+            if (imageUrl != null) {
+                this.texture = new ImageIcon(imageUrl).getImage();
+            }
+            g.drawImage(this.texture, (int)x, (int)y, this.size, this.size, null);
         }
     }
 

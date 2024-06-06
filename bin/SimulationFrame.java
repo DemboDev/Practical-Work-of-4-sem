@@ -3,20 +3,28 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class SimulationFrame extends JFrame {
-    private ParticlePanel particlePanel;
-    private ControlPanel panelGravity, panelFrequency;
-    private ControlField panelField;
-    private ControlButton btnPause, btnShow, btnRestart;
+    private final ParticlePanel particlePanel;
+    private final ControlPanel panelGravity;
+    private final ControlPanel panelFrequency;
+    private final ControlPanel panelLimit;
+    private final ControlField panelField;
+    private final ControlButton btnPause;
+    private final ControlButton btnShow;
+    private final ControlButton btnRestart;
+    private StatisticsPanel statisticsPanel;
+    private final int limitCells = 1000;
     private final int panelWidth = 1300, panelHeight = 600;
     private double G = 2;
-    private final int limitDiv = 200;
+    private int limitDiv = 200;
     private boolean isPaused = false, isShowed = true;
     int countOfTick;
     int initTypes;
-    private CellType plant;
+    private final CellType plant;
 
     //...........................................................................
     // Логика движения частиц
@@ -93,15 +101,16 @@ public class SimulationFrame extends JFrame {
 
     private void eating(Cell predator, Cell prey, java.util.List<Cell> toRemove, java.util.List<Cell> toAdd) {
         int damage = 10;
-        if (isNear(predator, prey)) {
-            if (canEat(predator, prey)) {
-                predator.getFood(damage);
-                prey.getDamage(damage);
-                if (prey.getHealth() <= 0) {
-                    toRemove.add(prey);
-                }
-                if (isBig(predator)) {
-                   division(predator, toAdd);
+        if (predator.getType() != plant) {
+            if (isNear(predator, prey)) {
+                if (canEat(predator, prey)) {
+                    if (predator.getSize() < 400 && predator.getSize() < limitDiv + 15) {
+                        predator.getFood(damage);
+                    }
+                    prey.getDamage(damage);
+                    if (prey.getHealth() <= 0) {
+                        toRemove.add(prey);
+                    }
                 }
             }
         }
@@ -112,9 +121,20 @@ public class SimulationFrame extends JFrame {
     }
 
     private void division(Cell predator, java.util.List<Cell> toAdd) {
-        predator.setSize((int) (predator.getSize() / 2));
-        predator.setHealth((int) (predator.getHealth() / 2));
-        toAdd.add(new Cell(predator.getX(), predator.getY(), predator.getType()));
+        predator.setSize(predator.getSize() / 2);
+        predator.setHealth(predator.getHealth() / 2);
+        toAdd.add(new Cell(predator.getX(), predator.getY(), predator.getType(), predator.getSize()));
+    }
+
+    private void updateParticles() {
+        // Ваша логика обновления частиц...
+
+        // Обновление статистики
+        Map<Integer, Integer> typeCounts = new HashMap<>();
+        for (Cell cell : particlePanel.getParticles()) {
+            typeCounts.put(cell.getType().getIndex(), typeCounts.getOrDefault(cell.getType().getIndex(), 0) + 1);
+        }
+        statisticsPanel.updateStatistics(typeCounts);
     }
 
     //...........................................................................
@@ -126,13 +146,19 @@ public class SimulationFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        particlePanel = new ParticlePanel();
+        Color darkGray = new Color(30,50,60);
+        Color gray = new Color(40,60,70);
+        Color white = new Color(235,235,235);
 
+        particlePanel = new ParticlePanel();
+        statisticsPanel = new StatisticsPanel();
+
+        JPanel topMainPanel = new JPanel();
         JPanel showPanel = new JPanel();
         JPanel topPanel = new JPanel();
         JPanel bottomPanel = new JPanel();
         JPanel settingsPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topMainPanel.setLayout(new BoxLayout(topMainPanel, BoxLayout.X_AXIS));
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
@@ -141,23 +167,31 @@ public class SimulationFrame extends JFrame {
         btnPause = new ControlButton("PAUSE");
         panelGravity = new ControlPanel("Gravity", 1, 300, 90);
         panelFrequency = new ControlPanel("Frequency", 10, 900, 100);
+        panelLimit = new ControlPanel("Limit", 50, 300, 200);
         panelField = new ControlField("Add Cells");
 
         topPanel.add(btnPause);
         topPanel.add(btnRestart);
-
         showPanel.add(btnShow);
 
         bottomPanel.add(panelField);
         bottomPanel.add(panelGravity);
         bottomPanel.add(panelFrequency);
+        bottomPanel.add(panelLimit);
+
+        bottomPanel.setBackground(darkGray);
+        settingsPanel.setBackground(darkGray);
+        showPanel.setBackground(darkGray);
+        topPanel.setBackground(darkGray);
 
         settingsPanel.add(bottomPanel);
         settingsPanel.add(showPanel);
+        topMainPanel.add(topPanel);
 
         add(particlePanel, BorderLayout.CENTER);
-        add(topPanel, BorderLayout.NORTH);
+        add(topMainPanel, BorderLayout.NORTH);
         add(settingsPanel, BorderLayout.SOUTH);
+        add(statisticsPanel, BorderLayout.EAST);
 
         //.................................................................
         // Создание частиц
@@ -165,9 +199,9 @@ public class SimulationFrame extends JFrame {
         initTypes = initialTypes;
         java.util.List<CellType> type = new ArrayList<>();
         for (int i = 1; i <= initialTypes; ++i) {
-            type.add(new CellType("textures/seaweed" + i + "[texture].png",100));
+            type.add(new CellType("textures/seaweed" + i + "[texture].png",100, i));
         }
-        plant = new CellType("notexture",5);
+        plant = new CellType("textures/plant.png",10, 0);
         type.add(plant);
         // Добавляем начальные частицы
         for (int i = 0; i < initialParticles; ++i){
@@ -176,10 +210,9 @@ public class SimulationFrame extends JFrame {
             }
         }
         for (int i = 0; i < 25; ++i) {
-            particlePanel.getParticles().add(new Cell(plant));
+            particlePanel.getParticles().add(new Cell(plant, 15));
             particlePanel.getParticles().getLast().setVx(0);
             particlePanel.getParticles().getLast().setVy(0);
-            particlePanel.getParticles().getLast().setSize(15);
         }
         //...........................................................................
         // Слушатели обновлений
@@ -189,14 +222,15 @@ public class SimulationFrame extends JFrame {
         Timer controlUpdateTimer = new Timer(frequency, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                limitDiv = panelLimit.getValue();
+                updateParticles();
                 countOfTick += 1;
                 if (countOfTick % 100 == 0) {
                     countOfTick -= 100;
                     for (int i = 0; i < 25; ++i) {
-                        particlePanel.getParticles().add(new Cell(plant));
+                        particlePanel.getParticles().add(new Cell(plant, 15));
                         particlePanel.getParticles().getLast().setVx(0);
                         particlePanel.getParticles().getLast().setVy(0);
-                        particlePanel.getParticles().getLast().setSize(10);
                     }
                 }
                 java.util.List<Cell> toAdd = new ArrayList<>();
@@ -207,6 +241,9 @@ public class SimulationFrame extends JFrame {
                 for (int i = 0; i < particlePanel.getParticles().size(); ++i) {
                     for (int j = 0; j < particlePanel.getParticles().size(); ++j) {
                         eating(particlePanel.getParticles().get(i), particlePanel.getParticles().get(j), toRemove, toAdd);
+                    }
+                    if (particlePanel.getParticles().size() < limitCells && isBig(particlePanel.getParticles().get(i))) {
+                        division(particlePanel.getParticles().get(i), toAdd);
                     }
                 }
                 particlePanel.getParticles().removeAll(toRemove);
@@ -222,6 +259,7 @@ public class SimulationFrame extends JFrame {
                 new StartWindow().setVisible(true);
                 // Сбросить панель частиц
                 particlePanel.reset();
+                statisticsPanel.updateStatistics(new HashMap<>());
                 SimulationFrame.this.dispose();
             }
         });

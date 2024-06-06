@@ -16,6 +16,13 @@ public class ControlButton extends JPanel {
         JPanel inputPanel = new JPanel();
         inputPanel.add(Button);
 
+        Button.setBorderPainted(false); // Убирает бордюр кнопки
+        Button.setFocusPainted(false); // Убирает окантовку при фокусировке
+
+        setBackground(Color.WHITE);
+        Button.setBackground(Color.WHITE);
+        Button.setForeground(Color.BLACK);
+
         add(inputPanel);
     }
 

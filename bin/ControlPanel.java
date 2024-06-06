@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.plaf.SliderUI;
+import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 
 public class ControlPanel extends JPanel {
@@ -11,7 +13,9 @@ public class ControlPanel extends JPanel {
         setLayout(new GridLayout(2, 1));
         Label = new JLabel(name);
         Slider = new JSlider(min, max, start);
-
+        Slider.setBackground(Color.DARK_GRAY);
+        setBackground(Color.DARK_GRAY);
+        Label.setForeground(Color.WHITE);
         add(Label);
         add(Slider);
     }
