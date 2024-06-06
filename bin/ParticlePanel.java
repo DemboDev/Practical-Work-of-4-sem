@@ -11,6 +11,11 @@ public class ParticlePanel extends JPanel {
         return particles;
     }
 
+    public void reset() {
+        particles.clear();
+        repaint();
+    }
+
     public ParticlePanel() { // сама панель
         setBackground(Color.WHITE); // закрашиваем фон в белый цвет
         timer = new Timer(5, e -> { // обновляем положение частиц каждый тик

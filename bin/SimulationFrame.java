@@ -165,9 +165,9 @@ public class SimulationFrame extends JFrame {
         initTypes = initialTypes;
         java.util.List<CellType> type = new ArrayList<>();
         for (int i = 1; i <= initialTypes; ++i) {
-            type.add(new CellType("textures/seaweed" + i + "[texture].png", 100));
+            type.add(new CellType("textures/seaweed" + i + "[texture].png",100));
         }
-        plant = new CellType("notexture", 5);
+        plant = new CellType("notexture",5);
         type.add(plant);
         // Добавляем начальные частицы
         for (int i = 0; i < initialParticles; ++i){
@@ -220,6 +220,8 @@ public class SimulationFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new StartWindow().setVisible(true);
+                // Сбросить панель частиц
+                particlePanel.reset();
                 SimulationFrame.this.dispose();
             }
         });

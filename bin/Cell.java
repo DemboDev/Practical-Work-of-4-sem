@@ -83,13 +83,13 @@ public class Cell {
     }
 
     public void getDamage(int damage) {
-        this.health -= damage;
-        this.size -= damage;
+        this.size = (int) (this.size - (int) damage);
+        this.health = (int) (this.health - (int) damage);
     }
 
     public void getFood(int damage) {
-        this.size += damage;
-        this.health += damage;
+        this.size = (int) (this.size + (int) damage);
+        this.health = (int) (this.health + (int) damage);
     }
 
     // Получение параметров при необходимости
