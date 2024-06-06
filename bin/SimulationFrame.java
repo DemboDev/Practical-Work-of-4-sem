@@ -12,7 +12,7 @@ public class SimulationFrame extends JFrame {
     private ControlButton btnPause, btnShow, btnRestart;
     private final int panelWidth = 1300, panelHeight = 600;
     private double G = 2;
-    private int frequency = 100;
+    private final int limitDiv = 200;
     private boolean isPaused = false, isShowed = true;
 
     //...........................................................................
@@ -65,6 +65,49 @@ public class SimulationFrame extends JFrame {
         }
     }
 
+    //...........................................................................
+    // Логика взаимодействия частиц
+    //...........................................................................
+    private boolean isNear(Cell f, Cell s) {
+        double whenNear = f.getSize() / 3 + s.getSize() / 3;
+        double cellsRadX = (f.getX() - s.getX());
+        double cellsRadY = (f.getY() - s.getY());
+        double radius = Math.sqrt(cellsRadX * cellsRadX + cellsRadY * cellsRadY);
+        if (radius >= whenNear)
+            return false;
+        else
+            return true;
+    }
+
+    private boolean canEat(Cell predator, Cell prey) {
+        return (predator.getSize() > prey.getSize() && predator.getType() != prey.getType());
+    }
+
+    private void eating(Cell predator, Cell prey, java.util.List<Cell> toRemove, java.util.List<Cell> toAdd) {
+        int damage = 10;
+        if (isNear(predator, prey)) {
+            if (canEat(predator, prey)) {
+                predator.getFood(damage);
+                prey.getDamage(damage);
+                if (prey.getHealth() <= 0) {
+                    toRemove.add(prey);
+                }
+                if (isBig(predator)) {
+                   division(predator, toAdd);
+                }
+            }
+        }
+    }
+
+    private boolean isBig(Cell predator) {
+        return predator.getSize() > limitDiv;
+    }
+
+    private void division(Cell predator, java.util.List<Cell> toAdd) {
+        predator.setSize((int) (predator.getSize() / 2));
+        predator.setHealth((int) (predator.getHealth() / 2));
+        toAdd.add(new Cell(predator.getX(), predator.getY(), predator.getType()));
+    }
     //...........................................................................
     // Основная функция
     //...........................................................................
@@ -125,14 +168,23 @@ public class SimulationFrame extends JFrame {
         //...........................................................................
         // Слушатели обновлений
         //...........................................................................
-        frequency = panelFrequency.getValue();
+        int frequency = panelFrequency.getValue();
         // Передвижение клеток
         Timer controlUpdateTimer = new Timer(frequency, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                java.util.List<Cell> toAdd = new ArrayList<>();
+                java.util.List<Cell> toRemove = new ArrayList<>();
                 G = (double) panelGravity.getValue() / 10;
                 moveNearID(particlePanel);
                 moveToBorder(particlePanel);
+                for (int i = 0; i < particlePanel.getParticles().size(); ++i) {
+                    for (int j = 0; j < particlePanel.getParticles().size(); ++j) {
+                        eating(particlePanel.getParticles().get(i), particlePanel.getParticles().get(j), toRemove, toAdd);
+                    }
+                }
+                particlePanel.getParticles().removeAll(toRemove);
+                particlePanel.getParticles().addAll(toAdd);
             }
         });
         controlUpdateTimer.start();
