@@ -18,6 +18,11 @@ public class SimulationFrame extends JFrame {
     private final ControlPanel panelGravity;
     private final ControlPanel panelFrequency;
     private final ControlPanel panelLimit;
+    private final ControlPanel panelDamage;
+    private final ControlPanel panelDPS;
+    private final ControlPanel panelDPSFreq;
+    private final ControlPanel panelFood;
+    private final ControlPanel panelFoodFreq;
     private final ControlField panelField;
     private final ControlButton btnPause;
     private final ControlButton btnShow;
@@ -25,7 +30,7 @@ public class SimulationFrame extends JFrame {
     private StatisticsPanel statisticsPanel;
     private Clip clip;
     private final int limitCells = 1000;
-    private final int panelWidth = 1300, panelHeight = 600;
+    private final int panelWidth = 1400, panelHeight = 730;
     private double G = 2;
     private int limitDiv = 200;
     private boolean isPaused = false, isShowed = true;
@@ -107,7 +112,7 @@ public class SimulationFrame extends JFrame {
     }
 
     private void eating(Cell predator, Cell prey, java.util.List<Cell> toRemove, java.util.List<Cell> toAdd) {
-        int damage = 10;
+        int damage = panelDamage.getValue();
         if (predator.getType() != plant) {
             if (isNear(predator, prey)) {
                 if (canEat(predator, prey)) {
@@ -189,6 +194,11 @@ public class SimulationFrame extends JFrame {
         panelGravity = new ControlPanel("Gravity", 1, 300, 90);
         panelFrequency = new ControlPanel("Frequency", 10, 900, 100);
         panelLimit = new ControlPanel("Limit", 50, 300, 200);
+        panelDamage = new ControlPanel("Damage of Cells", 1, 50, 15);
+        panelDPS = new ControlPanel("Damage per Seconds", 1, 10, 2);
+        panelDPSFreq = new ControlPanel("DPS Frequency", 1, 50, 10);
+        panelFoodFreq = new ControlPanel("Frequency of spawn food", 1, 300, 100);
+        panelFood = new ControlPanel("Count of spawn food", 1, 100, 25);
         panelField = new ControlField("Add Cells");
 
         topPanel.add(btnPause);
@@ -197,8 +207,13 @@ public class SimulationFrame extends JFrame {
 
         bottomPanel.add(panelField);
         bottomPanel.add(panelGravity);
-        bottomPanel.add(panelFrequency);
         bottomPanel.add(panelLimit);
+        bottomPanel.add(panelDamage);
+        bottomPanel.add(panelDPS);
+        bottomPanel.add(panelDPSFreq);
+        bottomPanel.add(panelFood);
+        bottomPanel.add(panelFoodFreq);
+        bottomPanel.add(panelFrequency);
 
         bottomPanel.setBackground(darkGray);
         settingsPanel.setBackground(darkGray);
@@ -219,7 +234,7 @@ public class SimulationFrame extends JFrame {
         //.................................................................
         initTypes = initialTypes;
         java.util.List<CellType> type = new ArrayList<>();
-        for (int i = 1; i <= initialTypes; ++i) {
+        for (int i = 1; i <= 5; ++i) {
             type.add(new CellType("textures/seaweed" + i + "[texture].png",100, i));
         }
         plant = new CellType("textures/plant.png",10, 0);
@@ -246,16 +261,28 @@ public class SimulationFrame extends JFrame {
                 limitDiv = panelLimit.getValue();
                 updateParticles();
                 countOfTick += 1;
-                if (countOfTick % 100 == 0) {
-                    countOfTick -= 100;
-                    for (int i = 0; i < 25; ++i) {
-                        particlePanel.getParticles().add(new Cell(plant, 15));
-                        particlePanel.getParticles().getLast().setVx(0);
-                        particlePanel.getParticles().getLast().setVy(0);
-                    }
-                }
                 java.util.List<Cell> toAdd = new ArrayList<>();
                 java.util.List<Cell> toRemove = new ArrayList<>();
+                if (countOfTick % 100 == 0)
+                    countOfTick -= 100;
+                if (countOfTick % panelFoodFreq.getValue() == 0) {
+                    if (particlePanel.getParticles().size() < limitCells) {
+                        for (int i = 0; i < panelFood.getValue(); ++i) {
+                            particlePanel.getParticles().add(new Cell(plant, 15));
+                            particlePanel.getParticles().getLast().setVx(0);
+                            particlePanel.getParticles().getLast().setVy(0);
+                        }
+                    }
+                }
+                if (countOfTick % panelDPSFreq.getValue() == 0) {
+                    for (Cell cell : particlePanel.getParticles()){
+                        if (cell.getType() != plant)
+                            cell.getDamage(panelDPS.getValue());
+                            if (cell.getHealth() <= 0) {
+                                toRemove.add(cell);
+                            }
+                    }
+                }
                 G = (double) panelGravity.getValue() / 10;
                 moveNearID(particlePanel);
                 moveToBorder(particlePanel);
@@ -332,10 +359,24 @@ public class SimulationFrame extends JFrame {
                                 for (int i = 0; i < numParticles; i++) {
                                     double x = Math.random() * particlePanel.getWidth();
                                     double y = Math.random() * particlePanel.getHeight();
-                                    CellType localType = type.get((int) (Math.random() * initialTypes));
-                                    particlePanel.addParticle(new Cell(x, y, localType));
-                                    if (isPaused){
-                                        particlePanel.getParticles().getLast().stop();
+                                    CellType localType;
+                                    int choice = panelField.getChoice();
+                                    if (choice >= 0 && choice <= 4) {
+                                        localType = type.get(panelField.getChoice());
+                                        particlePanel.addParticle(new Cell(x, y, localType, limitDiv));
+                                        if (isPaused){
+                                            particlePanel.getParticles().getLast().stop();
+                                        }
+                                    }
+                                    else if (choice == 5) {
+                                        localType = type.get((int) (Math.random() * initialTypes));
+                                        particlePanel.addParticle(new Cell(x, y, localType, limitDiv));
+                                        if (isPaused){
+                                            particlePanel.getParticles().getLast().stop();
+                                        }
+                                    }
+                                    else {
+                                        JOptionPane.showMessageDialog(SimulationFrame.this, "Please choose one", "Error", JOptionPane.ERROR_MESSAGE);
                                     }
                                 }
                             }
@@ -343,10 +384,24 @@ public class SimulationFrame extends JFrame {
                                 for (int i = 0; i < maxParticles - numParticles; i++) {
                                     double x = Math.random() * particlePanel.getWidth();
                                     double y = Math.random() * particlePanel.getHeight();
-                                    CellType localType = type.get((int) (Math.random() * initialTypes));
-                                    particlePanel.addParticle(new Cell(x, y, localType));
-                                    if (isPaused){
-                                        particlePanel.getParticles().getLast().stop();
+                                    CellType localType;
+                                    int choice = panelField.getChoice();
+                                    if (choice >= 1 && choice <= 5) {
+                                        localType = type.get(panelField.getChoice());
+                                        particlePanel.addParticle(new Cell(x, y, localType, limitDiv));
+                                        if (isPaused){
+                                            particlePanel.getParticles().getLast().stop();
+                                        }
+                                    }
+                                    else if (choice == 6) {
+                                        localType = type.get((int) (Math.random() * initialTypes));
+                                        particlePanel.addParticle(new Cell(x, y, localType, limitDiv));
+                                        if (isPaused){
+                                            particlePanel.getParticles().getLast().stop();
+                                        }
+                                    }
+                                    else {
+                                        JOptionPane.showMessageDialog(SimulationFrame.this, "Please choose one", "Error", JOptionPane.ERROR_MESSAGE);
                                     }
                                 }
                             }

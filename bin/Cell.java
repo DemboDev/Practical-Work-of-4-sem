@@ -5,6 +5,7 @@ import java.net.URL;
 import javax.swing.*;
 
 public class Cell {
+    private final int width = 1400, height = 730;
     // Координаты клетки
     private double x, y;
     // Вектор перемещения клетки
@@ -40,9 +41,6 @@ public class Cell {
         this.y = y;
         this.type = type;
         this.size = size;
-        if (this.size < 50) {
-            this.size = 50;
-        }
         this.health = size;
         // случайная начальная скорость
         URL imageUrl = getClass().getResource(type.getTexturePath());
@@ -53,14 +51,11 @@ public class Cell {
         this.vy = (Math.random() - 0.5) * 2 * 10;
     }
     public Cell(CellType type) {
-        this.x = (Math.random()) * 1500;
-        this.y = (Math.random()) * 800;
+        this.x = (Math.random()) * width;
+        this.y = (Math.random()) * height;
         this.type = type;
         int s = (int) (Math.random() + 0.5) * differSize;
         this.size = Math.abs(this.type.getSize() + s);
-        if (this.size < 50) {
-            this.size = 50;
-        }
         this.health = size;
         URL imageUrl = getClass().getResource(type.getTexturePath());
         if (imageUrl != null) {
@@ -70,8 +65,8 @@ public class Cell {
         this.vy = (Math.random() - 0.5) * 2 * 10;
     }
     public Cell(CellType type, int size) {
-        this.x = (Math.random()) * 1500;
-        this.y = (Math.random()) * 800;
+        this.x = (Math.random()) * width;
+        this.y = (Math.random()) * height;
         this.type = type;
         this.size = size;
         this.health = size;
@@ -115,13 +110,13 @@ public class Cell {
     }
 
     public void getDamage(int damage) {
-        this.size = (int) (this.size - (int) damage);
-        this.health = (int) (this.health - (int) damage);
+        this.size = (this.size - damage);
+        this.health = (this.health - damage);
     }
 
     public void getFood(int damage) {
-        this.size = (int) (this.size + (int) damage);
-        this.health = (int) (this.health + (int) damage);
+        this.size = (this.size + damage);
+        this.health = (this.health + damage);
     }
 
     // Получение параметров при необходимости
