@@ -1,11 +1,9 @@
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.net.URL;
 import javax.swing.*;
 
 public class Cell {
-    private final int width = 1400, height = 730;
     // Координаты клетки
     private double x, y;
     // Вектор перемещения клетки
@@ -13,35 +11,13 @@ public class Cell {
     private int size;
     private CellType type;
     private Image texture;
-    private int health;
-    // Константа
-    private final int differSize = 20;
 
     // Создание клетки (конструкторы)
-    public Cell(double x, double y, CellType type) {
-        this.x = x;
-        this.y = y;
-        this.type = type;
-        int s = (int) (Math.random() + 0.5) * differSize;
-        this.size = type.getSize() + s;
-        if (this.size < 50) {
-            this.size = 50;
-        }
-        this.health = size;
-        // случайная начальная скорость
-        URL imageUrl = getClass().getResource(type.getTexturePath());
-        if (imageUrl != null) {
-            this.texture = new ImageIcon(imageUrl).getImage();
-        }
-        this.vx = (Math.random() - 0.5) * 2 * 10;
-        this.vy = (Math.random() - 0.5) * 2 * 10;
-    }
     public Cell(double x, double y, CellType type, int size) {
         this.x = x;
         this.y = y;
         this.type = type;
         this.size = size;
-        this.health = size;
         // случайная начальная скорость
         URL imageUrl = getClass().getResource(type.getTexturePath());
         if (imageUrl != null) {
@@ -51,12 +27,11 @@ public class Cell {
         this.vy = (Math.random() - 0.5) * 2 * 10;
     }
     public Cell(CellType type) {
-        this.x = (Math.random()) * width;
-        this.y = (Math.random()) * height;
+        this.x = (Math.random()) * 1400;
+        this.y = (Math.random()) * 730;
         this.type = type;
-        int s = (int) (Math.random() + 0.5) * differSize;
+        int s = (int) (Math.random() + 0.5) * 20;
         this.size = Math.abs(this.type.getSize() + s);
-        this.health = size;
         URL imageUrl = getClass().getResource(type.getTexturePath());
         if (imageUrl != null) {
             this.texture = new ImageIcon(imageUrl).getImage();
@@ -65,11 +40,10 @@ public class Cell {
         this.vy = (Math.random() - 0.5) * 2 * 10;
     }
     public Cell(CellType type, int size) {
-        this.x = (Math.random()) * width;
-        this.y = (Math.random()) * height;
+        this.x = (Math.random()) * 1400;
+        this.y = (Math.random()) * 730;
         this.type = type;
         this.size = size;
-        this.health = size;
         URL imageUrl = getClass().getResource(type.getTexturePath());
         if (imageUrl != null) {
             this.texture = new ImageIcon(imageUrl).getImage();
@@ -111,12 +85,10 @@ public class Cell {
 
     public void getDamage(int damage) {
         this.size = (this.size - damage);
-        this.health = (this.health - damage);
     }
 
     public void getFood(int damage) {
         this.size = (this.size + damage);
-        this.health = (this.health + damage);
     }
 
     // Получение параметров при необходимости
@@ -128,7 +100,7 @@ public class Cell {
     public double getLastVY() { return lastVY; }
     public CellType getType() { return type; }
     public int getSize() { return (int) size; }
-    public int getHealth() {return health;}
+
     // Установка параметров при необходимости
     public void setX(double x) { this.x = x; }
     public void setY(double y) { this.y = y; }
@@ -137,5 +109,4 @@ public class Cell {
     public void setLastVX(double lastVX) { this.lastVX = lastVX; }
     public void setLastVY(double lastVY) { this.lastVY = lastVY; }
     public void setSize(int size) { this.size = size; }
-    public void setHealth(int health) {this.health = health;}
 }

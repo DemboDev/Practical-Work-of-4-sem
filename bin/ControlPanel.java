@@ -1,6 +1,4 @@
 import javax.swing.*;
-import javax.swing.plaf.SliderUI;
-import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 
 public class ControlPanel extends JPanel {

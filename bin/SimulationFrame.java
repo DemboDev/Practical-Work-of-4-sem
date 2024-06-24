@@ -7,11 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.sound.sampled.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class SimulationFrame extends JFrame {
     private final ParticlePanel particlePanel;
@@ -26,8 +23,7 @@ public class SimulationFrame extends JFrame {
     private final ControlField panelField;
     private final ControlButton btnPause;
     private final ControlButton btnShow;
-    private final ControlButton btnRestart;
-    private StatisticsPanel statisticsPanel;
+    private final StatisticsPanel statisticsPanel;
     private Clip clip;
     private final int limitCells = 1000;
     private final int panelWidth = 1400, panelHeight = 730;
@@ -41,6 +37,7 @@ public class SimulationFrame extends JFrame {
     //...........................................................................
     // Логика движения частиц
     //...........................................................................
+    // движение к ближайшей клетке того же типа
     public void moveNearID(ParticlePanel particlePanel){
         for (int i = 0; i < particlePanel.getParticles().size(); ++i){
             CellType fType = particlePanel.getParticles().get(i).getType();
@@ -68,7 +65,7 @@ public class SimulationFrame extends JFrame {
             }
         }
     }
-
+    // столкновение с границами поля
     public void moveToBorder(ParticlePanel particlePanel){
         for (int i = 0; i < particlePanel.getParticles().size(); ++i){
             if (particlePanel.getParticles().get(i).getX() < 1) {
@@ -106,11 +103,11 @@ public class SimulationFrame extends JFrame {
         double radius = Math.sqrt(cellsRadX * cellsRadX + cellsRadY * cellsRadY);
         return (radius <= whenNear);
     }
-
+    // проверка возможности поглощения
     private boolean canEat(Cell predator, Cell prey) {
         return (predator.getSize() > prey.getSize() && predator.getType() != prey.getType() && predator.getType() != plant);
     }
-
+    // поглощение клетки
     private void eating(Cell predator, Cell prey, java.util.List<Cell> toRemove, java.util.List<Cell> toAdd) {
         int damage = panelDamage.getValue();
         if (predator.getType() != plant) {
@@ -120,34 +117,32 @@ public class SimulationFrame extends JFrame {
                         predator.getFood(damage);
                     }
                     prey.getDamage(damage);
-                    if (prey.getHealth() <= 0) {
+                    if (prey.getSize() <= 0) {
                         toRemove.add(prey);
                     }
                 }
             }
         }
     }
-
+    // проверка размера клетки
     private boolean isBig(Cell predator) {
         return predator.getSize() > limitDiv;
     }
-
+    // деление клетки
     private void division(Cell predator, java.util.List<Cell> toAdd) {
         predator.setSize(predator.getSize() / 2);
-        predator.setHealth(predator.getHealth() / 2);
         toAdd.add(new Cell(predator.getX(), predator.getY(), predator.getType(), predator.getSize()));
         playSound();
     }
-
+    // проигрывание звука деления
     private void playSound() {
         if (clip.isRunning())
             clip.stop();
         clip.setFramePosition(0);
         clip.start();
     }
-
+    // Обновление статистики
     private void updateParticles() {
-        // Обновление статистики
         Map<Integer, Integer> typeCounts = new HashMap<>();
         for (Cell cell : particlePanel.getParticles()) {
             typeCounts.put(cell.getType().getIndex(), typeCounts.getOrDefault(cell.getType().getIndex(), 0) + 1);
@@ -163,7 +158,7 @@ public class SimulationFrame extends JFrame {
         setSize(panelWidth, panelHeight);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
+        // загружаем проигрываемый звук
         try {
             clip = AudioSystem.getClip();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream("Sounds/division.wav")));
@@ -175,7 +170,7 @@ public class SimulationFrame extends JFrame {
         Color darkGray = new Color(30,50,60);
         Color gray = new Color(40,60,70);
         Color white = new Color(235,235,235);
-
+        // создаем необходимые элементы
         particlePanel = new ParticlePanel();
         statisticsPanel = new StatisticsPanel();
 
@@ -188,7 +183,7 @@ public class SimulationFrame extends JFrame {
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
-        btnRestart = new ControlButton("RESTART");
+        ControlButton btnRestart = new ControlButton("RESTART");
         btnShow = new ControlButton("HIDE");
         btnPause = new ControlButton("PAUSE");
         panelGravity = new ControlPanel("Gravity", 1, 300, 90);
@@ -200,7 +195,7 @@ public class SimulationFrame extends JFrame {
         panelFoodFreq = new ControlPanel("Frequency of spawn food", 1, 300, 100);
         panelFood = new ControlPanel("Count of spawn food", 1, 100, 25);
         panelField = new ControlField("Add Cells");
-
+        // последовательно добавляем элементы на экран
         topPanel.add(btnPause);
         topPanel.add(btnRestart);
         showPanel.add(btnShow);
@@ -278,7 +273,7 @@ public class SimulationFrame extends JFrame {
                     for (Cell cell : particlePanel.getParticles()){
                         if (cell.getType() != plant)
                             cell.getDamage(panelDPS.getValue());
-                            if (cell.getHealth() <= 0) {
+                            if (cell.getSize() <= 0) {
                                 toRemove.add(cell);
                             }
                     }
